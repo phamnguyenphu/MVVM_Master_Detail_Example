@@ -15,10 +15,6 @@ struct User: Codable {
     let address: Address
     let phone, website: String
     let company: Company
-
-    var nameAndPhone: String {
-        "\(name)" + "-" + "\(phone)"
-    }
 }
 
 // MARK: - Address

@@ -16,21 +16,29 @@ struct ContentView: View {
     // MARK: - BODY
 
     var body: some View {
-        NavigationStack {
-            List {
-                ForEach(users, id: \.id) { user in
-                    UserItemView(user: user)
+        if vm.isLoading {
+            ProgressView()
+        } else {
+            NavigationView {
+                List {
+                    ForEach(users, id: \.id) { user in
+                        NavigationLink {
+                            UserDetailView(user: user)
+                        } label: {
+                            UserItemView(user: user)
+                        }
+                    }
                 }
+                .listStyle(.plain)
+                .navigationTitle("Users API")
+                .navigationBarTitleDisplayMode(.large)
             }
-            .listStyle(.plain)
-            .navigationTitle("Users API")
-        }
-        .task {
-            do {
-//                 vm.fetchUsers()
-                users = try await vm.getUsers()
-            } catch {
-                print("Failure in UI")
+            .task {
+                do {
+                    users = try await vm.getUsers()
+                } catch {
+                    print(error)
+                }
             }
         }
     }
