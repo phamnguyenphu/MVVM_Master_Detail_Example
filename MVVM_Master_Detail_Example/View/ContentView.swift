@@ -11,36 +11,36 @@ struct ContentView: View {
     // MARK: - PROPERTY
 
     @StateObject var vm = UserViewModel()
-    @State private var users = [User]()
 
     // MARK: - BODY
 
     var body: some View {
-        if vm.isLoading {
-            ProgressView()
-        } else {
-            NavigationView {
-                List {
-                    ForEach(users, id: \.id) { user in
-                        NavigationLink {
-                            UserDetailView(user: user)
-                        } label: {
-                            UserItemView(user: user)
+        NavigationView {
+            ZStack(alignment: .center) {
+                if vm.isLoading {
+                    ProgressView()
+                } else {
+                    List {
+                        ForEach(vm.users, id: \.id) { user in
+                            NavigationLink {
+                                UserDetailView(user: user)
+                            } label: {
+                                UserItemView(user: user)
+                            }
                         }
                     }
+                    .listStyle(.plain)
                 }
-                .listStyle(.plain)
-                .navigationTitle("Users API")
-                .navigationBarTitleDisplayMode(.large)
-            }
-            .task {
-                do {
-                    users = try await vm.getUsers()
-                } catch {
-                    print(error)
+            } // ZStack
+            .navigationTitle("Users API MVVM")
+            .onAppear(perform: vm.fetchUser)
+            .alert(isPresented: $vm.hasError,
+                   error: vm.error) {
+                Button(action: vm.fetchUser) {
+                    Text("Retry")
                 }
             }
-        }
+        } // Navigation View
     }
 }
 
